@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>江湖弹笔社</title>
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:"Noto Serif SC",serif,Microsoft YaHei;
+}
+:root{
+    /* ==========浅色主题(默认)========== */
+    --bg-main:#fffdf5;
+    --bg-card:#fffef8;
+    --bg-modal:#fffef8;
+    --text-main:#444;
+    --text-title:#b8860b;
+    --text-modal:#333;
+    --border-gold:#b8860b;
+    --border-footer:#e6d7a9;
+    --bg-button:#b8860b;
+    --bg-button-hover:#966c00;
+    --hero-text:#8b5700;
+    --mask-bg:rgba(0,0,0,0.75);
+    --hero-mask:rgba(255,255,255,0.65);
+    --transition-all:background 0.35s ease,color 0.35s ease,border-color 0.35s ease;
+}
+/* ==========深色主题变量========== */
+[data-theme="dark"]{
+    --bg-main:#141418;
+    --bg-card:#1e1e24;
+    --bg-modal:#1e1e24;
+    --text-main:#e2e2e2;
+    --text-title:#ffcc44;
+    --text-modal:#ececec;
+    --border-gold:#d4a42c;
+    --border-footer:#383222;
+    --bg-button:#d4a42c;
+    --bg-button-hover:#b3881c;
+    --hero-text:#ffdd77;
+    --mask-bg:rgba(0,0,0,0.85);
+    --hero-mask:rgba(0,0,0,0.55);
+}
+html,body{
+    transition:var(--transition-all);
+}
+body{
+    background:var(--bg-main);
+    color:var(--text-main);
+}
+
+/* 版权勾选弹窗 */
+.modal-mask{
+    position:fixed;
+    top:0;
+    left:0;
+    width:100vw;
+    height:100vh;
+    background:rgba(0,0,0,0.85);
+    z-index:999;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+.modal-box{
+    width:min(90%,620px);
+    background:var(--bg-modal);
+    border:2px solid var(--border-gold);
+    padding:32px;
+    border-radius:12px;
+    transition:var(--transition-all);
+}
+.modal-box h2{
+    color:var(--text-title);
+    text-align:center;
+    margin-bottom:20px;
+    letter-spacing:2px;
+}
+.modal-text{
+    line-height:1.8;
+    font-size:16px;
+    color:var(--text-modal);
+    margin-bottom:24px;
+    transition:var(--transition-all);
+}
+.agree-row{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-bottom:20px;
+}
+#agreeCheck{
+    width:18px;height:18px;
+}
+#enterBtn{
+    width:100%;
+    padding:14px;
+    background:var(--bg-button);
+    color:#fff;
+    border:none;
+    border-radius:8px;
+    font-size:17px;
+    font-weight:bold;
+    cursor:pointer;
+    transition:var(--transition-all);
+}
+#enterBtn:disabled{
+    background:#d4c288;
+    color:#666;
+    cursor:not-allowed;
+}
+.main-site{
+    display:none;
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+}
+/* 首页主页界面 */
+.home-page{
+    flex:1;
+    width:100%;
+    min-height:calc(100vh - 80px);
+    background: linear-gradient(var(--hero-mask),var(--hero-mask)), url("bg.jpg");
+    background-size:cover;
+    background-position:center;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    color:var(--hero-text);
+    text-align:center;
+    padding:20px;
+    gap:32px;
+    transition:var(--transition-all);
+}
+.home-page h1{
+    font-size:52px;
+    letter-spacing:4px;
+}
+.home-buttons{
+    display:flex;
+    gap:20px;
+    flex-wrap:wrap;
+    justify-content:center;
+}
+.page-btn{
+    padding:14px 32px;
+    background:var(--bg-button);
+    color:#ffffff;
+    border:none;
+    border-radius:8px;
+    font-size:18px;
+    cursor:pointer;
+    transition:0.2s;
+}
+.page-btn:hover{
+    background:var(--bg-button-hover);
+    transform: translateY(-3px);
+}
+/* 主题切换按钮 */
+.theme-toggle-btn{
+    margin-top:12px;
+    padding:10px 26px;
+    background:transparent;
+    color:var(--hero-text);
+    border:2px solid var(--border-gold);
+    border-radius:8px;
+    font-size:16px;
+    cursor:pointer;
+    transition:0.25s;
+}
+.theme-toggle-btn:hover{
+    background:var(--bg-button);
+    color:#fff;
+}
+
+/* 子页面样式（点击按钮后进入的独立界面） */
+.sub-page{
+    display:none;
+    flex:1;
+    min-height:calc(100vh - 80px);
+    background:var(--bg-main);
+    padding:40px 20px;
+    transition:var(--transition-all);
+}
+.sub-page.active{
+    display:block;
+}
+.back-btn{
+    margin-bottom:30px;
+    padding:10px 24px;
+    background:var(--bg-button);
+    color:#fff;
+    border:none;
+    border-radius:8px;
+    cursor:pointer;
+    font-size:16px;
+    transition:var(--transition-all);
+}
+.container{
+    max-width:1200px;
+    margin:0 auto;
+}
+.section-title{
+    color:var(--text-title);
+    font-size:28px;
+    margin-bottom:20px;
+    border-left:4px solid var(--border-gold);
+    padding-left:12px;
+    transition:var(--transition-all);
+}
+.card-grid{
+    display:grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px,1fr));
+    gap:24px;
+}
+.event-card{
+    background:var(--bg-card);
+    border:2px solid var(--border-gold);
+    border-radius:12px;
+    padding:24px;
+    cursor:pointer;
+    transition:0.25s ease;
+}
+.event-card:hover{
+    transform: translateY(-6px);
+    box-shadow:0 8px 20px rgba(184,134,11,0.25);
+    background:#fff8e0;
+}
+[data-theme="dark"] .event-card:hover{
+    background:#2a2820;
+}
+.event-card h3{
+    color:var(--text-title);
+    margin-bottom:10px;
+    font-size:20px;
+    transition:var(--transition-all);
+}
+.event-card p{
+    color:var(--text-main);
+    line-height:1.6;
+    transition:var(--transition-all);
+}
+
+/* 卡片弹窗 */
+.popup-mask{
+    position:fixed;
+    top:0;
+    left:0;
+    width:100vw;
+    height:100vh;
+    background:var(--mask-bg);
+    z-index:998;
+    display:none;
+    align-items:center;
+    justify-content:center;
+}
+.popup-box{
+    width:min(90%,580px);
+    background:var(--bg-modal);
+    border:2px solid var(--border-gold);
+    border-radius:12px;
+    padding:32px;
+    transition:var(--transition-all);
+}
+.popup-box h2{
+    color:var(--text-title);
+    margin-bottom:16px;
+    transition:var(--transition-all);
+}
+.popup-box p{
+    color:var(--text-modal);
+    font-size:17px;
+    line-height:1.8;
+    transition:var(--transition-all);
+}
+.close-btn{
+    margin-top:24px;
+    width:100%;
+    padding:12px;
+    background:var(--bg-button);
+    color:#fff;
+    border:none;
+    border-radius:8px;
+    font-weight:bold;
+    cursor:pointer;
+    font-size:16px;
+    transition:var(--transition-all);
+}
+/* 全局底部版权 */
+footer{
+    text-align:center;
+    padding:30px;
+    color:#777;
+    border-top:1px solid var(--border-footer);
+    width:100%;
+    transition:var(--transition-all);
+}
+</style>
+</head>
+<body>
+<!-- 版权勾选弹窗 -->
+<div class="modal-mask" id="modal">
+    <div class="modal-box">
+        <h2>【版权与赛事须知】</h2>
+        <div class="modal-text">
+            本班通用弹笔规则及游戏本身经过我们的流入及改造而流行，拥有江湖游戏版权。此后一切关于本游戏的赛事需要向我们进行申请。如果发现私下进行比赛组织或盈利性推销，将被拉入黑名单。
+        </div>
+        <div class="agree-row">
+            <input type="checkbox" id="agreeCheck">
+            <label for="agreeCheck">我已阅读并同意以上版权条款</label>
+        </div>
+        <button id="enterBtn" disabled>进入江湖弹笔社官网</button>
+    </div>
+</div>
+<div class="main-site" id="main">
+    <!-- 首页界面 -->
+    <div class="home-page" id="home">
+        <h1>江湖弹笔社</h1>
+        <div class="home-buttons">
+            <button class="page-btn" data-target="officialMatch">官方赛事</button>
+            <button class="page-btn" data-target="authMatch">授权赛事</button>
+            <button class="page-btn" data-target="activity">活动赛事</button>
+            <button class="page-btn" data-target="notice">公告</button>
+        </div>
+        <!-- ✅主题切换按钮，在4个按钮下方 -->
+        <button class="theme-toggle-btn" id="themeToggle">切换深色模式</button>
+    </div>
+    <!-- 【独立界面】官方赛事 -->
+    <div class="sub-page" id="officialMatch">
+        <div class="container">
+            <button class="back-btn">← 返回主页</button>
+            <h2 class="section-title">官方赛事</h2>
+            <div class="card-grid" id="grid-officialMatch"></div>
+        </div>
+    </div>
+    <!-- 【独立界面】授权赛事 -->
+    <div class="sub-page" id="authMatch">
+        <div class="container">
+            <button class="back-btn">← 返回主页</button>
+            <h2 class="section-title">授权赛事</h2>
+            <div class="card-grid" id="grid-authMatch"></div>
+        </div>
+    </div>
+    <!-- 【独立界面】活动赛事 -->
+    <div class="sub-page" id="activity">
+        <div class="container">
+            <button class="back-btn">← 返回主页</button>
+            <h2 class="section-title">活动赛事</h2>
+            <div class="card-grid" id="grid-activity"></div>
+        </div>
+    </div>
+    <!-- 【独立界面】公告 -->
+    <div class="sub-page" id="notice">
+        <div class="container">
+            <button class="back-btn">← 返回主页</button>
+            <h2 class="section-title">公告</h2>
+            <div class="card-grid" id="grid-notice"></div>
+        </div>
+    </div>
+    <!-- 全局底部版权 -->
+    <footer>© 江湖弹笔社 版权所有</footer>
+</div>
+<!-- 卡片弹窗 -->
+<div class="popup-mask" id="popupMask">
+    <div class="popup-box">
+        <h2 id="popTitle"></h2>
+        <p id="popDesc"></p>
+        <button class="close-btn" id="popClose">关闭</button>
+    </div>
+</div>
+<script>
+// ======================【卡片添加区，在这里新增卡片！】======================
+// 格式：{板块id, 卡片标题, 卡片简介, 弹窗详情}
+const cardList = [
+    // 官方赛事
+    {
+        target:"officialMatch",
+        title:"“我擂个斗”S1",
+        short:"决赛时间：下周一",
+        desc:"决赛时间：下周一"
+    },
+    //授权赛事
+    {
+        target:"authMatch",
+        title:"康瑞恒马良杯",
+        short:"神笔马良！",
+        desc:"等待康瑞恒说明。。。"
+    },
+    {
+        target:"authMatch",
+        title:"刘峻玮峻发杯",
+        short:"（发杯是什么",
+        desc:"所以发杯到底是啥啊？"
+    },
+    //活动赛事
+    {
+        target:"activity",
+        title:"没有",
+        short:"待更新",
+        desc:"后续活动赛事内容将在此更新。"
+    },
+    //公告
+    {
+        target:"notice",
+        title:"公告通知",
+        short:"待更新",
+        desc:"社团通知、重要消息在此发布。"
+    }
+];
+// =========================================================================
+// 自动渲染所有卡片，不用手动写html
+function renderCards(){
+    cardList.forEach(item=>{
+        const grid = document.getElementById("grid-"+item.target);
+        const cardDiv = document.createElement("div");
+        cardDiv.className = "event-card";
+        cardDiv.dataset.title = item.title;
+        cardDiv.dataset.desc = item.desc;
+        cardDiv.innerHTML = `<h3>${item.title}</h3><p>${item.short}</p>`;
+        grid.appendChild(cardDiv);
+    })
+}
+renderCards();
+
+// ============深色浅色模式逻辑 本地存储记住选择============
+const themeToggle = document.getElementById("themeToggle");
+const htmlRoot = document.documentElement;
+//读取本地保存
+let currentTheme = localStorage.getItem("theme") || "light";
+applyTheme(currentTheme);
+
+function applyTheme(mode){
+    if(mode === "dark"){
+        htmlRoot.setAttribute("data-theme","dark");
+        themeToggle.innerText = "切换浅色模式";
+    }else{
+        htmlRoot.removeAttribute("data-theme");
+        themeToggle.innerText = "切换深色模式";
+    }
+    localStorage.setItem("theme",mode);
+}
+themeToggle.onclick = ()=>{
+    const newMode = htmlRoot.hasAttribute('data-theme') ? "light":"dark";
+    applyTheme(newMode);
+}
+// ======================================================
+
+const modal = document.getElementById("modal");
+const main = document.getElementById("main");
+const agreeCheck = document.getElementById("agreeCheck");
+const enterBtn = document.getElementById("enterBtn");
+const homePage = document.getElementById("home");
+const subPages = document.querySelectorAll(".sub-page");
+agreeCheck.onchange = ()=>{
+    enterBtn.disabled = !agreeCheck.checked;
+}
+enterBtn.onclick = ()=>{
+    modal.style.display = "none";
+    main.style.display = "flex";
+}
+// 点击主页按钮：隐藏首页，打开对应独立界面
+document.querySelectorAll(".page-btn").forEach(btn=>{
+    btn.onclick = function(){
+        const targetId = this.dataset.target;
+        homePage.style.display = "none";
+        subPages.forEach(page=>page.classList.remove("active"));
+        document.getElementById(targetId).classList.add("active");
+    }
+})
+// 返回主页按钮
+document.querySelectorAll(".back-btn").forEach(btn=>{
+    btn.onclick = function(){
+        subPages.forEach(page=>page.classList.remove("active"));
+        homePage.style.display = "flex";
+    }
+})
+//卡片弹窗
+const mask = document.getElementById("popupMask");
+const popTitle = document.getElementById("popTitle");
+const popDesc = document.getElementById("popDesc");
+const closeBtn = document.getElementById("popClose");
+document.querySelectorAll(".event-card").forEach(card=>{
+    card.onclick = function(){
+        popTitle.innerText = this.dataset.title;
+        popDesc.innerText = this.dataset.desc;
+        mask.style.display = "flex";
+    }
+})
+closeBtn.onclick = ()=> mask.style.display = "none";
+mask.onclick = function(e){
+    if(e.target === mask) mask.style.display = "none";
+}
+</script>
+</body>
+</html>
