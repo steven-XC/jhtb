@@ -4,7 +4,7 @@
 <link rel="icon" type="image/png" href="https://i.imgs.ovh/2026/10/16/6a456c36b6a70a760ca3a5fb3ea3e74c.png">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>江湖弹笔社1.0</title>
+<title>江湖弹笔社2.0</title>
 <style>
 *{
     margin:0;
@@ -52,7 +52,6 @@ body{
     background:var(--bg-main);
     color:var(--text-main);
 }
-
 /* 版权勾选弹窗 */
 .modal-mask{
     position:fixed;
@@ -177,7 +176,6 @@ body{
     background:var(--bg-button);
     color:#fff;
 }
-
 /* 子页面样式（点击按钮后进入的独立界面） */
 .sub-page{
     display:none;
@@ -225,6 +223,7 @@ body{
     padding:24px;
     cursor:pointer;
     transition:0.25s ease;
+    position:relative;
 }
 .event-card:hover{
     transform: translateY(-6px);
@@ -237,6 +236,7 @@ body{
 .event-card h3{
     color:var(--text-title);
     margin-bottom:10px;
+    margin-top:8px;
     font-size:20px;
     transition:var(--transition-all);
 }
@@ -245,6 +245,22 @@ body{
     line-height:1.6;
     transition:var(--transition-all);
 }
+/* ==========卡片右上角比赛状态标签========== */
+.event-status{
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: bold;
+    color: #fff;
+    white-space: nowrap;
+}
+.status-soon{background:#f0ad4e;}    /*即将开始-橙色*/
+.status-live{background:#51b44b;}   /*进行中-绿色*/
+.status-delay{background:#ff7f50;} /*推迟-橙红*/
+.status-end{background:#6c757d;}    /*已结束-灰色*/
 
 /* 卡片弹窗 */
 .popup-mask{
@@ -375,34 +391,38 @@ footer{
 </div>
 <script>
 // ======================【卡片添加区，在这里新增卡片！】======================
-// 格式：{板块id, 卡片标题, 卡片简介, 弹窗详情}
+// 格式：{板块id, 卡片标题, 卡片简介, 弹窗详情, status:"即将开始 / 进行中 / 推迟 / 已结束"}
 const cardList = [
     // 官方赛事
     {
         target:"officialMatch",
         title:"“我擂个斗”S1",
         short:"决赛时间：下周一",
-        desc:"决赛时间：下周一"
+        desc:"决赛时间：下周一",
+        status:"未开始"
     },
     //授权赛事
     {
         target:"authMatch",
         title:"康瑞恒马良杯",
         short:"神笔马良！",
-        desc:"等待康瑞恒说明。。。"
+        desc:"等待康瑞恒说明。。。",
+        status:"推迟"
     },
     {
         target:"authMatch",
         title:"刘峻玮峻发杯",
         short:"（发杯是什么",
-        desc:"所以发杯到底是啥啊？"
+        desc:"所以发杯到底是啥啊？",
+        status:"未开始"
     },
     //活动赛事
     {
         target:"activity",
-        title:"没有",
-        short:"待更新",
-        desc:"后续活动赛事内容将在此更新。"
+        title:"二周年庆典",
+        short:"时间：下周二",
+        desc:"",
+        status:"未开始"
     },
     //公告
     {
@@ -410,6 +430,7 @@ const cardList = [
         title:"公告通知",
         short:"待更新",
         desc:"社团通知、重要消息在此发布。"
+        //不写status，卡片就不会显示状态标签
     }
 ];
 // =========================================================================
@@ -421,19 +442,34 @@ function renderCards(){
         cardDiv.className = "event-card";
         cardDiv.dataset.title = item.title;
         cardDiv.dataset.desc = item.desc;
-        cardDiv.innerHTML = `<h3>${item.title}</h3><p>${item.short}</p>`;
+
+        let statusHtml = "";
+        if(item.status){
+            let cls = "";
+            switch(item.status){
+                case "未开始": cls="status-soon";break;
+                case "进行中": cls="status-live";break;
+                case "推迟": cls="status-delay";break;
+                case "已结束": cls="status-end";break;
+            }
+            statusHtml = `<span class="event-status ${cls}">${item.status}</span>`;
+        }
+
+        cardDiv.innerHTML = `
+            ${statusHtml}
+            <h3>${item.title}</h3>
+            <p>${item.short}</p>
+        `;
         grid.appendChild(cardDiv);
     })
 }
 renderCards();
-
 // ============深色浅色模式逻辑 本地存储记住选择============
 const themeToggle = document.getElementById("themeToggle");
 const htmlRoot = document.documentElement;
 //读取本地保存
 let currentTheme = localStorage.getItem("theme") || "light";
 applyTheme(currentTheme);
-
 function applyTheme(mode){
     if(mode === "dark"){
         htmlRoot.setAttribute("data-theme","dark");
@@ -449,7 +485,6 @@ themeToggle.onclick = ()=>{
     applyTheme(newMode);
 }
 // ======================================================
-
 const modal = document.getElementById("modal");
 const main = document.getElementById("main");
 const agreeCheck = document.getElementById("agreeCheck");
