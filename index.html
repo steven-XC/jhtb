@@ -27,6 +27,7 @@
     --hero-text:#8b5700;
     --mask-bg:rgba(0,0,0,0.75);
     --hero-mask:rgba(255,255,255,0.65);
+    --hero-bg:url("https://beeimg.us.ci/temp/6ad392a2b1d49.png");
     --transition-all:background 0.35s ease,color 0.35s ease,border-color 0.35s ease;
 }
 /* ==========深色主题变量========== */
@@ -44,6 +45,7 @@
     --hero-text:#ffdd77;
     --mask-bg:rgba(0,0,0,0.85);
     --hero-mask:rgba(0,0,0,0.55);
+    --hero-bg:url("https://beeimg.us.ci/temp/6ad392fad18a8.png");
 }
 html,body{
     transition:var(--transition-all);
@@ -123,7 +125,7 @@ body{
     flex:1;
     width:100%;
     min-height:calc(100vh - 80px);
-    background: linear-gradient(var(--hero-mask),var(--hero-mask)), url("bg.jpg");
+    background: linear-gradient(var(--hero-mask),var(--hero-mask)), var(--hero-bg);
     background-size:cover;
     background-position:center;
     display:flex;
@@ -257,11 +259,10 @@ body{
     color: #fff;
     white-space: nowrap;
 }
-.status-soon{background:#f0ad4e;}    /*即将开始-橙色*/
+.status-soon{background:#f0ad4e;}    /*未开始-橙色*/
 .status-live{background:#51b44b;}   /*进行中-绿色*/
 .status-delay{background:#ff7f50;} /*推迟-橙红*/
 .status-end{background:#6c757d;}    /*已结束-灰色*/
-
 /* 卡片弹窗 */
 .popup-mask{
     position:fixed;
@@ -391,7 +392,7 @@ footer{
 </div>
 <script>
 // ======================【卡片添加区，在这里新增卡片！】======================
-// 格式：{板块id, 卡片标题, 卡片简介, 弹窗详情, status:"即将开始 / 进行中 / 推迟 / 已结束"}
+// 格式：{板块id, 卡片标题, 卡片简介, 弹窗详情, status:"未开始 / 进行中 / 推迟 / 已结束"}
 const cardList = [
     // 官方赛事
     {
@@ -442,7 +443,6 @@ function renderCards(){
         cardDiv.className = "event-card";
         cardDiv.dataset.title = item.title;
         cardDiv.dataset.desc = item.desc;
-
         let statusHtml = "";
         if(item.status){
             let cls = "";
@@ -454,7 +454,6 @@ function renderCards(){
             }
             statusHtml = `<span class="event-status ${cls}">${item.status}</span>`;
         }
-
         cardDiv.innerHTML = `
             ${statusHtml}
             <h3>${item.title}</h3>
